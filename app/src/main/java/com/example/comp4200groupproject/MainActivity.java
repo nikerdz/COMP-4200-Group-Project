@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(MainActivity.this, ToDoActivity.class));
                     return true;
                 } else if (item.getItemId() == R.id.nav_planner) {
-                    startActivity(new Intent(MainActivity.this, RemindersActivity.class));
+                    startActivity(new Intent(MainActivity.this, PlannerActivity.class));
                     return true;
                 } else if (item.getItemId() == R.id.nav_notes) {
                     startActivity(new Intent(MainActivity.this, NotesActivity.class));
