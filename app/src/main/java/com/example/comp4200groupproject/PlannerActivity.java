@@ -1,17 +1,16 @@
 package com.example.comp4200groupproject;
 
+import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 
 import java.util.Calendar;
 
@@ -48,6 +47,35 @@ ArrayAdapter<String> adapter;
     }
 
     private void addCalendarEvent() {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.add_event_dialog);
+        dialog.show();
+        EditText eventName = dialog.findViewById(R.id.eventName);
+        EditText eventTime = dialog.findViewById(R.id.EventTime);
+        Button btnCancel = dialog.findViewById(R.id.btnCancel);
+        Button btnSave = dialog.findViewById(R.id.btnSave);
+
+        btnSave.setOnClickListener(v -> {
+            String event = eventName.getText().toString();
+            String time = eventTime.getText().toString();
+
+           String events = sharedPreferences.getString(date, "");
+
+            if (events.isEmpty()) {
+                events = event + " " + time;
+            } else {
+                events += event + " " + time + ",";
+            }
+            sharedPreferences.edit().putString(date, events).apply();
+            showCalendarEvents(date);
+            dialog.dismiss();
+
+        });
+        btnCancel.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+
+
 
     }
 
