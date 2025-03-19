@@ -9,6 +9,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.COMP4200GroupProject">
 
+        <activity
+            android:name=".AddReminderActivity"
+            android:exported="false" />
+
         <!-- Main Activity (Home Page) -->
         <activity
             android:name=".MainActivity"
