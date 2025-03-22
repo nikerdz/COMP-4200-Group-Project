@@ -31,7 +31,7 @@
         <activity android:name=".PlannerActivity" />
 
         <!-- Notes Activity -->
-        <activity android:name=".NotesActivity" />
+        <activity android:name=".NotesActivity"/>
 
         <!-- Reminders Activity -->
         <activity android:name=".RemindersActivity" />
