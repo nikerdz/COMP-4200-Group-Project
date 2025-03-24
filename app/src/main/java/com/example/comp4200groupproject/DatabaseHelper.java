@@ -18,16 +18,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE reminders (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, due_date TEXT)");
         db.execSQL("CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT)");
+        db.execSQL("CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, time TEXT, date TEXT)");
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS reminders");
         db.execSQL("DROP TABLE IF EXISTS notes");
+        db.execSQL("DROP TABLE IF EXISTS events");
         onCreate(db);
     }
 
-    // ✅ Reminder insert method
     public long insertReminder(String title, String dueDate) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -113,4 +115,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete("notes", "id = ?", new String[]{String.valueOf(id)});
         db.close();
     }
+
+    public long insertEvent(String title, String time, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("title", title);
+        values.put("time", time);
+        values.put("date", date);
+        long id = db.insert("events", null, values);
+        db.close();
+        return id;
+
+
+    }
+    public List<PlannerEvent> getAllEvents(String date) {
+        List<PlannerEvent> events = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM events WHERE date = ?", new String[]{date});
+
+        if(cursor != null) {
+            while (cursor.moveToNext()) {
+                events.add(new PlannerEvent(
+                        cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                        cursor.getString(cursor.getColumnIndexOrThrow("time"))
+                ));
+            }
+            cursor.close();
+
+        }
+
+        db.close();
+        return events;
+    }
+
+    public void deleteEvent(String title) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("events", "title = ?", new String[]{title});
+        db.close();
+
+    }
+
+
 }
