@@ -12,9 +12,11 @@ import java.util.List;
 
 public class PlannerAdapter extends RecyclerView.Adapter<PlannerAdapter.PlannerViewHolder>{
     private List<PlannerEvent> eventList;
+    private DatabaseHelper dbHelper;
 
-    public PlannerAdapter(List<PlannerEvent> eventList) {
+    public PlannerAdapter(List<PlannerEvent> eventList, DatabaseHelper dbHelper) {
         this.eventList = eventList;
+        this.dbHelper = dbHelper;
     }
 
     @NonNull

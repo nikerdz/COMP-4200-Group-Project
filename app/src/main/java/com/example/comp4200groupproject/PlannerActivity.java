@@ -3,16 +3,14 @@ package com.example.comp4200groupproject;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,21 +43,27 @@ private List<PlannerEvent> eventList;
         bottomNav.setItemIconTintList(null);  // Disable tinting
         dbHelper = new DatabaseHelper(this);
         eventList = new ArrayList<>();
-        adapter = new PlannerAdapter(eventList);
+        adapter = new PlannerAdapter(eventList, dbHelper);
 
         calendarView = findViewById(R.id.calendarView);
         addButton = findViewById(R.id.addButton);
         recyclerView = findViewById(R.id.recyclerview);
         calendar = Calendar.getInstance();
-        calendarView.setDate(calendar.getTimeInMillis());;
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
-            date = dayOfMonth + "/" + (month + 1) + "/" + year;
-            showCalendarEvents(date);
+        showCalendarEvents();
+
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+                calendar.set(year, month, dayOfMonth);
+                showCalendarEvents();
+            }
         });
+
+
         addButton.setOnClickListener(v -> {
            addCalendarEvent();
         });
@@ -90,6 +94,7 @@ private List<PlannerEvent> eventList;
         dialog.setContentView(R.layout.add_event_dialog);
         dialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         dialog.show();
+
         EditText eventName = dialog.findViewById(R.id.eventName);
         EditText eventTime = dialog.findViewById(R.id.EventTime);
         Button btnCancel = dialog.findViewById(R.id.btnCancel);
@@ -108,7 +113,9 @@ private List<PlannerEvent> eventList;
                         calendar.set(Calendar.MINUTE, minute);
                         time = simpleDateFormat.format(calendar.getTime());
                         eventTime.setText(time);
-                    }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE),
+                    },
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
                     false
             );
             timePickerDialog.setTitle("Select Time");
@@ -118,34 +125,35 @@ private List<PlannerEvent> eventList;
         btnSave.setOnClickListener(v -> {
             String event = eventName.getText().toString();
             String timeOfEvent = eventTime.getText().toString();
-            String date = calendarView.getDate() + "";
+            String date = formatDate(calendar.getTimeInMillis());
 
-           if (!event.isEmpty() && !timeOfEvent.isEmpty() && !date.isEmpty()) {
-               dbHelper.insertEvent(event, timeOfEvent, date);
-               eventList.add(new PlannerEvent(event, timeOfEvent));
-               adapter.notifyDataSetChanged();
-           }
+            if (!event.isEmpty() && !timeOfEvent.isEmpty() && !date.isEmpty()) {
+                dbHelper.insertEvent(event, timeOfEvent, date);
+                eventList.add(new PlannerEvent(event, timeOfEvent, date));
+                adapter.notifyDataSetChanged();
+            }
             dialog.dismiss();
-            showCalendarEvents(date);
-
+            showCalendarEvents();
         });
+
         btnCancel.setOnClickListener(v -> {
             dialog.dismiss();
         });
-
-
-
     }
 
-    private void showCalendarEvents(String date) {
-        if(dbHelper == null){
-            return;
-        }
+    private void showCalendarEvents() {
         eventList.clear();
+        String date = formatDate(calendar.getTimeInMillis());
         eventList.addAll(dbHelper.getAllEvents(date));
         adapter.notifyDataSetChanged();
-
     }
+
+    private String formatDate(long dateInMillis) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(dateInMillis);
+    }
+
+
 
 
 }
