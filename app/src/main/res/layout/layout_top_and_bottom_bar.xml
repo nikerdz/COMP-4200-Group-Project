@@ -2,11 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ToDoActivity"
-    android:background="@color/bg">
+    android:layout_height="wrap_content">
 
     <!-- Top Bar -->
     <LinearLayout
@@ -21,12 +18,12 @@
 
         <!-- Home Logo (Top Left) -->
         <ImageView
-            android:id="@+id/btn_home"
+            android:id="@+id/logo_home"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_gravity="center_vertical"
             android:src="@drawable/home2"
-            android:contentDescription="Home Button"
+            android:contentDescription="Home Logo"
             android:layout_marginEnd="16dp" />
 
         <!-- Empty View for spacing -->
@@ -57,5 +54,4 @@
         android:layout_alignParentBottom="true"
         android:background="#F1E9F7"
         app:menu="@menu/bottom_nav_menu" />
-
 </RelativeLayout>

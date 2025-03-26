@@ -10,21 +10,67 @@ import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
+    public static final String DATABASE_NAME = "study_buddy.db";
+    public static final int DATABASE_VERSION = 3;  // Incremented version for new table
+
     public DatabaseHelper(Context context) {
-        super(context, "reminders.db", null, 2); // Ensure version is up to date
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE reminders (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, due_date TEXT)");
         db.execSQL("CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT)");
+
+        // ✅ Add users table
+        db.execSQL("CREATE TABLE users (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "name TEXT, " +
+                "education TEXT)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS reminders");
         db.execSQL("DROP TABLE IF EXISTS notes");
+        db.execSQL("DROP TABLE IF EXISTS users");
+        if (oldVersion < 3) {
+            // Add the new users table when upgrading
+            db.execSQL("CREATE TABLE IF NOT EXISTS users (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "name TEXT, " +
+                    "education TEXT)");
+        }
         onCreate(db);
+    }
+
+    // ✅ Insert user data
+    public long insertUser(String name, String education) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("name", name);
+        values.put("education", education);
+
+        long id = db.insert("users", null, values);
+        db.close();
+        return id;
+    }
+
+    // ✅ Retrieve user data
+    public User getUser() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM users LIMIT 1", null);
+        User user = null;
+
+        if (cursor.moveToFirst()) {
+            String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            String education = cursor.getString(cursor.getColumnIndexOrThrow("education"));
+            user = new User(name, education);
+        }
+
+        cursor.close();
+        db.close();
+        return user;
     }
 
     // ✅ Reminder insert method
@@ -37,6 +83,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         long id = db.insert("reminders", null, values);
         db.close();
         return id;
+    }
+
+    // ✅ Update user data
+    public void updateUser(int id, String name, String education) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("name", name);
+        values.put("education", education);
+
+        db.update("users", values, "id = ?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+
+    // ✅ Delete user data
+    public void deleteUser(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("users", "id = ?", new String[]{String.valueOf(id)});
+        db.close();
     }
 
     // Optional: existing Reminder method (if still used elsewhere)

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HomeActivity"
+    android:background="@color/bg">
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:background="?android:attr/windowBackground"
+        android:paddingTop="50dp"
+        android:layout_marginTop="70dp"
+        android:padding="8dp">
+
+        <!-- Home Logo (Top Left) -->
+        <ImageView
+            android:id="@+id/logo_home"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/home2"
+            android:contentDescription="Home Logo"
+            android:layout_marginEnd="16dp" />
+
+
+        <!-- Empty View for spacing -->
+        <ImageView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/title"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"/>
+
+        <!-- Profile Button (Top Right) -->
+        <ImageView
+            android:id="@+id/btn_profile"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/profile"
+            android:contentDescription="Profile"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+    <!-- Greeting Section -->
+    <LinearLayout
+        android:id="@+id/greeting_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/top_bar"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/tv_greeting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello, [Name] !"
+            android:textSize="25sp"
+            android:textColor="@color/pink"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Today's date: Month XXth, Year"
+            android:textSize="18sp"
+            android:textColor="#555555"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+    <!-- Motivational Quote Section -->
+    <LinearLayout
+        android:id="@+id/quote_container"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/greeting_section"
+        android:layout_margin="16dp"
+        android:background="@color/tan"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:elevation="4dp"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/honey_blooms"
+            android:text="Motivation of the Day"
+            android:textSize="30sp"
+            android:textColor="@color/pink"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"/>
+
+        <TextView
+            android:id="@+id/tv_quote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/honey_blooms"
+            android:text="Success is not final, failure is not fatal: it is the courage to continue that counts."
+            android:textSize="30sp"
+            android:textColor="#000000"
+            android:textAlignment="center"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        app:itemIconSize="70dp"
+        android:layout_alignParentBottom="true"
+        android:background="#F1E9F7"
+        app:menu="@menu/bottom_nav_menu" />
+
+</RelativeLayout>

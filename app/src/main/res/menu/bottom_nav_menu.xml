@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/nav_def"
+        android:icon="@drawable/todo"
+        android:title="Def"
+        android:visible="false"/>
+    <item
         android:id="@+id/nav_todo"
         android:icon="@drawable/todo"
         android:title="To-Do" />
     <item
         android:id="@+id/nav_planner"
         android:icon="@drawable/planner"
-        android:title="Notes" />
+        android:title="Planner" />
     <item
         android:id="@+id/nav_notes"
         android:icon="@drawable/notes"
-        android:title="Planner" />
+        android:title="Notes" />
     <item
         android:id="@+id/nav_reminder"
         android:icon="@drawable/reminders"

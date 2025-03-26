@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">COMP 4200 Group Project</string>
+    <!-- Education Levels -->
+    <string-array name="education_levels">
+        <item>What is your Education Level?</item>  <!-- Placeholder -->
+        <item>Primary School</item>
+        <item>Secondary School</item>
+        <item>College</item>
+        <item>University</item>
+    </string-array>
 </resources>
