@@ -8,40 +8,58 @@
     android:orientation="vertical"
     tools:context=".PlannerActivity">
 
+
     <CalendarView
         android:id="@+id/calendarView"
-        android:layout_width="414dp"
-        android:layout_height="385dp"
-        android:layout_marginBottom="1dp"
-        app:layout_constraintBottom_toTopOf="@+id/listView"
+        android:layout_width="406dp"
+        android:layout_height="360dp"
+        android:paddingTop="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerview"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="spread"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_default="spread" />
 
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="411dp"
-        android:layout_height="281dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginBottom="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <!-- Bottom Navigation Bar -->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview"
+        android:layout_width="412dp"
+        android:layout_height="211dp"
+        android:layout_marginTop="3dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/calendarView" />
 
     <ImageButton
         android:id="@+id/addButton"
-        android:layout_width="51dp"
-        android:layout_height="49dp"
+        android:layout_width="61dp"
+        android:layout_height="59dp"
         android:layout_marginStart="373dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="7dp"
-        android:layout_marginBottom="7dp"
+        android:layout_marginBottom="96dp"
         android:background="@android:drawable/ic_menu_add"
         android:backgroundTint="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.75"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listView" />
+        app:layout_constraintTop_toBottomOf="@+id/recyclerview" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/btm_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="2dp"
+        android:background="?android:attr/windowBackground"
+        app:itemIconSize="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addButton"
+        app:menu="@menu/bottom_nav_menu" />
 </androidx.constraintlayout.widget.ConstraintLayout>
