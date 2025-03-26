@@ -1,43 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    tools:context=".NotesActivity">
 
-    <!-- 🔍 Search Bar -->
-    <EditText
-        android:id="@+id/editTextSearch"
+    <!-- Top Bar -->
+    <LinearLayout
+        android:id="@+id/top_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Search notes..." />
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:background="?android:attr/windowBackground"
+        android:paddingTop="50dp"
+        android:layout_marginTop="70dp"
+        android:padding="8dp">
 
-    <EditText
-        android:id="@+id/editTextNote"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter note content"
-        android:layout_marginTop="8dp"/>
+        <!-- Home Logo (Top Left) -->
+        <ImageView
+            android:id="@+id/btn_home"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/home2"
+            android:contentDescription="Home Button"
+            android:layout_marginEnd="16dp" />
 
-    <Button
-        android:id="@+id/buttonAddNote"
+        <!-- Empty View for spacing -->
+        <ImageView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/title"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"/>
+
+        <!-- Profile Button (Top Right) -->
+        <ImageView
+            android:id="@+id/btn_profile"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/profile"
+            android:contentDescription="Profile"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/planner_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Note"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"/>
+        android:text="Name's Notes"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"
+        android:layout_below="@id/top_bar"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold"/>
 
-    <Button
-        android:id="@+id/buttonSort"
+    <!-- Search Bar with Sort Button beside it -->
+    <RelativeLayout
+        android:id="@+id/search_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/planner_title"
+        android:layout_margin="8dp">
+
+        <!-- Search Bar -->
+        <EditText
+            android:id="@+id/editTextSearch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/buttonSort"
+            android:layout_alignParentStart="true"
+            android:layout_weight="1"
+            android:hint="Search notes..."
+            android:background="@drawable/edit_text_border"
+            android:padding="10dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"/>
+
+        <!-- Sort Button -->
+        <Button
+            android:id="@+id/buttonSort"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="Sort Notes"
+            android:backgroundTint="@color/pink"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:layout_marginBottom="-13dp"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_no_notes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sort Notes"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"/>
+        android:text="You have no notes! Press the button to add a note"
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/search_container"
+        android:layout_above="@id/bottom_navigation"
+        android:layout_marginBottom="100dp"
+        android:layout_centerHorizontal="true"
 
+        android:visibility="gone" />
+
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewNotes"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_below="@id/search_container"
+        android:layout_above="@id/bottom_navigation"
         android:layout_marginTop="10dp" />
-</LinearLayout>
+
+    <!-- Floating Action Button for Add Event -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_add_note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@android:drawable/ic_input_add"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="170dp"
+        android:layout_marginEnd="16dp"
+        app:backgroundTint="@color/pink"
+        app:tint="@android:color/white"
+        app:fabSize="normal"
+        android:contentDescription="Add Event" />
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        app:itemIconSize="70dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/grey"
+        app:menu="@menu/bottom_nav_menu" />
+
+</RelativeLayout>

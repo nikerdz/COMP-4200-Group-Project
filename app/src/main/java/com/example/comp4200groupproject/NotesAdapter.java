@@ -3,25 +3,24 @@ package com.example.comp4200groupproject;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
-    private List<Note> originalList;    // full list
-    private List<Note> displayList;     // filtered list
+    private List<Note> originalList;
+    private List<Note> displayList;
     private DatabaseHelper dbHelper;
-    private String currentKeyword = "";
 
     public NotesAdapter(List<Note> notesList, DatabaseHelper dbHelper) {
         this.originalList = new ArrayList<>(notesList);
@@ -33,39 +32,19 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
     @Override
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(android.R.layout.simple_list_item_1, parent, false);
+                .inflate(R.layout.item_note_tile, parent, false);
         return new NoteViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
         Note note = displayList.get(position);
-        String content = note.getContent();
-        String prefix = (position + 1) + ". ";
-        String fullText = prefix + content;
+        holder.textViewNoteTile.setText(note.getContent());
 
-        SpannableString span = new SpannableString(fullText);
-
-        if (!currentKeyword.isEmpty()) {
-            String lowerContent = content.toLowerCase();
-            String lowerKeyword = currentKeyword.toLowerCase();
-            int keywordIndex = lowerContent.indexOf(lowerKeyword);
-            if (keywordIndex >= 0) {
-                int start = prefix.length() + keywordIndex;
-                int end = start + currentKeyword.length();
-
-                span.setSpan(
-                        new ForegroundColorSpan(Color.parseColor("#800080")),  // deep purple
-                        start, end,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                );
-            }
-        }
-
-        holder.textViewNote.setText(span);
-
+        // Edit on single click
         holder.itemView.setOnClickListener(v -> showEditDialog(v.getContext(), note, position));
 
+        // Delete on long press
         holder.itemView.setOnLongClickListener(v -> {
             dbHelper.deleteNote(note.getId());
             originalList.remove(note);
@@ -83,11 +62,10 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
     public void updateList(List<Note> fullList, String keyword) {
         this.originalList = new ArrayList<>(fullList);
-        this.currentKeyword = keyword.trim();
         this.displayList.clear();
 
         for (Note note : originalList) {
-            if (note.getContent().toLowerCase().contains(currentKeyword.toLowerCase())) {
+            if (note.getContent().toLowerCase().contains(keyword.toLowerCase())) {
                 this.displayList.add(note);
             }
         }
@@ -109,7 +87,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
                 note.setContent(newContent);
                 notifyItemChanged(position);
             } else {
-                Toast.makeText(context, "Note content cannot be empty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Note cannot be empty", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -118,11 +96,11 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
     }
 
     static class NoteViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewNote;
+        TextView textViewNoteTile;
 
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewNote = itemView.findViewById(android.R.id.text1);
+            textViewNoteTile = itemView.findViewById(R.id.textViewNoteTile);
         }
     }
 }

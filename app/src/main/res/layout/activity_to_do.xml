@@ -68,7 +68,7 @@
         android:text="Your list is empty! Press the button to add a task"
         android:textSize="16sp"
         android:layout_below="@id/tv_todo_title"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="200dp"
         android:layout_centerHorizontal="true"
         android:textColor="@android:color/darker_gray"/>
 

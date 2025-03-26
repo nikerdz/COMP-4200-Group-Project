@@ -101,7 +101,7 @@ public class ToDoActivity extends AppCompatActivity {
 
                 // Set alternating background color based on task index
                 if (taskIndex % 2 == 0) {
-                    taskView.setBackgroundColor(getResources().getColor(R.color.grey));  // Even tasks - Light background
+                    taskView.setBackgroundColor(getResources().getColor(R.color.white));  // Even tasks - Light background
                 } else {
                     taskView.setBackgroundColor(getResources().getColor(R.color.bg));  // Odd tasks - Dark background
                 }
