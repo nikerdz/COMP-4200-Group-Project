@@ -1,65 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".PlannerActivity">
+    android:background="@color/bg">
 
+    <!-- Top Bar -->
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:background="?android:attr/windowBackground"
+        android:paddingTop="50dp"
+        android:layout_marginTop="70dp"
+        android:padding="8dp">
 
+        <!-- Home Logo (Top Left) -->
+        <ImageView
+            android:id="@+id/btn_home"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/home2"
+            android:contentDescription="Home Button"
+            android:layout_marginEnd="16dp" />
+
+        <!-- Empty View for spacing -->
+        <ImageView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/title"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"/>
+
+        <!-- Profile Button (Top Right) -->
+        <ImageView
+            android:id="@+id/btn_profile"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/profile"
+            android:contentDescription="Profile"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+    <!-- Title for Planner -->
+    <TextView
+        android:id="@+id/planner_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name's Planner"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"
+        android:layout_below="@id/top_bar"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold"/>
+
+    <!-- Calendar View -->
     <CalendarView
         android:id="@+id/calendarView"
-        android:layout_width="406dp"
+        android:layout_width="match_parent"
         android:layout_height="360dp"
+        android:layout_below="@id/planner_title"
+        android:layout_marginTop="16dp"
         android:paddingTop="5dp"
-        app:layout_constraintBottom_toTopOf="@+id/recyclerview"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_default="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_default="spread" />
+        android:layout_centerHorizontal="true"/>
 
-    <!-- Bottom Navigation Bar -->
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview"
-        android:layout_width="412dp"
-        android:layout_height="211dp"
-        android:layout_marginTop="3dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/calendarView" />
-
-    <ImageButton
-        android:id="@+id/addButton"
-        android:layout_width="61dp"
-        android:layout_height="59dp"
-        android:layout_marginStart="373dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="7dp"
-        android:layout_marginBottom="96dp"
-        android:background="@android:drawable/ic_menu_add"
-        android:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.75"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerview" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/btm_nav"
+    <TextView
+        android:id="@+id/tv_empty_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/calendarView"
+        android:text="No events scheduled for this day!"
+        android:textSize="18sp"
+        android:textColor="@android:color/darker_gray"
+        android:gravity="center"
+        android:layout_marginTop="32dp" />
+
+    <!-- Scrollable section for events -->
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@id/calendarView"
+        android:layout_above="@id/bottom_navigation"
+        android:fillViewport="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <!-- RecyclerView inside the ScrollView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_event_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:scrollbars="vertical"
+                tools:listitem="@layout/item_event" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Floating Action Button for Add Event -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_add_event"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@android:drawable/ic_input_add"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="2dp"
-        android:background="?android:attr/windowBackground"
-        app:itemIconSize="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addButton"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="170dp"
+        android:layout_marginEnd="16dp"
+        app:backgroundTint="@color/pink"
+        app:tint="@android:color/white"
+        app:fabSize="normal"
+        android:contentDescription="Add Event" />
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        app:itemIconSize="70dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/grey"
         app:menu="@menu/bottom_nav_menu" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

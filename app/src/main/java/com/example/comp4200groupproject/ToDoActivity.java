@@ -59,7 +59,6 @@ public class ToDoActivity extends AppCompatActivity {
         bottomNav.setSelectedItemId(R.id.nav_todo); // Highlight current tab
         bottomNav.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.nav_todo) {
-                startActivity(new Intent(ToDoActivity.this, ToDoActivity.class));
                 return true;
             } else if (item.getItemId() == R.id.nav_planner) {
                 startActivity(new Intent(ToDoActivity.this, PlannerActivity.class));

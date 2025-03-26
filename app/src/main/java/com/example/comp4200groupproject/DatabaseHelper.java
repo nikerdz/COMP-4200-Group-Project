@@ -11,7 +11,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "study_buddy.db";
-    public static final int DATABASE_VERSION = 4;  // Incremented version for new table
+    public static final int DATABASE_VERSION = 5;  // Incremented version for new table
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -22,26 +22,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE reminders (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, due_date TEXT)");
         db.execSQL("CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT)");
         db.execSQL("CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, education TEXT)");
+        db.execSQL("CREATE TABLE todo (id INTEGER PRIMARY KEY AUTOINCREMENT, task TEXT, is_completed INTEGER DEFAULT 0)");
 
-        // ✅ Use IF NOT EXISTS to prevent re-creation issues
-        db.execSQL("CREATE TABLE IF NOT EXISTS todo (" +
+        // Create the new events table for PlannerActivity
+        db.execSQL("CREATE TABLE IF NOT EXISTS events (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "task TEXT, " +
-                "is_completed INTEGER DEFAULT 0)");
+                "event_name TEXT, " +
+                "event_time TEXT, " +
+                "event_date TEXT)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Drop old tables if they exist
         db.execSQL("DROP TABLE IF EXISTS reminders");
         db.execSQL("DROP TABLE IF EXISTS notes");
         db.execSQL("DROP TABLE IF EXISTS users");
-        if (oldVersion < 4) {
-            // Add the To-Do table when upgrading
-            db.execSQL("CREATE TABLE IF NOT EXISTS todo (" +
+        db.execSQL("DROP TABLE IF EXISTS todo");
+        db.execSQL("DROP TABLE IF EXISTS events"); // Drop the events table if it exists (for upgrades)
+
+        // Re-create all tables
+        if (oldVersion < 5) {
+            // Add the events table for PlannerActivity
+            db.execSQL("CREATE TABLE IF NOT EXISTS events (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "task TEXT, " +
-                    "is_completed INTEGER DEFAULT 0)");
+                    "event_name TEXT, " +
+                    "event_time TEXT, " +
+                    "event_date TEXT)");
         }
+
+        // Create new tables again
         onCreate(db);
     }
 
@@ -162,6 +172,79 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Modify the insertEvent method to accept PlannerEvent
+    public long insertEvent(PlannerEvent event) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("event_name", event.getTitle());
+        values.put("event_time", event.getTime());
+        values.put("event_date", event.getDate());
+
+        // Insert the event into the database and return the row ID
+        long result = db.insert("events", null, values);
+        db.close();
+        return result;
+    }
+
+
+    // Method to delete an event by ID
+    public void deleteEvent(int eventId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String whereClause = "id = ?";
+        String[] whereArgs = {String.valueOf(eventId)};
+
+        // Delete the event
+        db.delete("events", whereClause, whereArgs);
+        db.close();
+    }
+
+    // Method to update an event's details
+    public void updateEvent(int eventId, String eventName, String eventTime, String eventDate) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("event_name", eventName);
+        values.put("event_time", eventTime);
+        values.put("event_date", eventDate);
+
+        String whereClause = "id = ?";
+        String[] whereArgs = {String.valueOf(eventId)};
+
+        // Update the event
+        db.update("events", values, whereClause, whereArgs);
+        db.close();
+    }
+
+
+    public List<PlannerEvent> getAllEvents(String date) {
+        List<PlannerEvent> eventList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] columns = {"event_name", "event_time", "event_date"};
+        String selection = "event_date = ?";
+        String[] selectionArgs = {date};
+
+        Cursor cursor = db.query("events", columns, selection, selectionArgs, null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int eventNameIndex = cursor.getColumnIndex("event_name");
+                int eventTimeIndex = cursor.getColumnIndex("event_time");
+                int eventDateIndex = cursor.getColumnIndex("event_date");
+
+                // Check if the column index is valid (>= 0) before retrieving the value
+                String eventName = (eventNameIndex >= 0) ? cursor.getString(eventNameIndex) : null;
+                String eventTime = (eventTimeIndex >= 0) ? cursor.getString(eventTimeIndex) : null;
+                String eventDate = (eventDateIndex >= 0) ? cursor.getString(eventDateIndex) : null;
+
+                eventList.add(new PlannerEvent(eventName, eventTime, eventDate));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        db.close();
+        return eventList;
+    }
+
+
     // Optional: existing Reminder method (if still used elsewhere)
     public void addReminder(String title, String dueDate) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -189,6 +272,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return reminders;
     }
+
 
     public void deleteReminder(String title) {
         SQLiteDatabase db = this.getWritableDatabase();
