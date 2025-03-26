@@ -11,7 +11,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "study_buddy.db";
-    public static final int DATABASE_VERSION = 3;  // Incremented version for new table
+    public static final int DATABASE_VERSION = 4;  // Incremented version for new table
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -21,12 +21,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE reminders (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, due_date TEXT)");
         db.execSQL("CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT)");
+        db.execSQL("CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, education TEXT)");
 
-        // ✅ Add users table
-        db.execSQL("CREATE TABLE users (" +
+        // ✅ Use IF NOT EXISTS to prevent re-creation issues
+        db.execSQL("CREATE TABLE IF NOT EXISTS todo (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "name TEXT, " +
-                "education TEXT)");
+                "task TEXT, " +
+                "is_completed INTEGER DEFAULT 0)");
     }
 
     @Override
@@ -34,14 +35,72 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS reminders");
         db.execSQL("DROP TABLE IF EXISTS notes");
         db.execSQL("DROP TABLE IF EXISTS users");
-        if (oldVersion < 3) {
-            // Add the new users table when upgrading
-            db.execSQL("CREATE TABLE IF NOT EXISTS users (" +
+        if (oldVersion < 4) {
+            // Add the To-Do table when upgrading
+            db.execSQL("CREATE TABLE IF NOT EXISTS todo (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "name TEXT, " +
-                    "education TEXT)");
+                    "task TEXT, " +
+                    "is_completed INTEGER DEFAULT 0)");
         }
         onCreate(db);
+    }
+
+    // ✅ INSERT a new task
+    public long addTask(String task) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("task", task);
+        values.put("is_completed", 0);  // Default to incomplete
+
+        long id = db.insert("todo", null, values);
+        db.close();
+        return id;
+    }
+
+    // ✅ RETRIEVE all tasks
+    public List<Task> getAllTasks() {
+        List<Task> taskList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM todo", null);
+
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+            String task = cursor.getString(cursor.getColumnIndexOrThrow("task"));
+            boolean isCompleted = cursor.getInt(cursor.getColumnIndexOrThrow("is_completed")) == 1;
+
+            taskList.add(new Task(id, task, isCompleted));
+        }
+
+        cursor.close();
+        db.close();
+        return taskList;
+    }
+
+    // ✅ UPDATE task content
+    public void updateTask(int id, String newTask) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("task", newTask);
+        db.update("todo", values, "id = ?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+
+    // ✅ TOGGLE task completion status
+    public void updateTaskCompletionStatus(String taskId, boolean isCompleted) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("is_completed", isCompleted ? 1 : 0);
+
+        db.update("todo", values, "id = ?", new String[]{taskId});
+        db.close();
+    }
+
+
+    // ✅ DELETE a task
+    public void deleteTask(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("todo", "id = ?", new String[]{String.valueOf(id)});
+        db.close();
     }
 
     // ✅ Insert user data

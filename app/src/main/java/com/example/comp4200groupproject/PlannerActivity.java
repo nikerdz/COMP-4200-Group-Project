@@ -128,7 +128,7 @@ private List<PlannerEvent> eventList;
             String date = formatDate(calendar.getTimeInMillis());
 
             if (!event.isEmpty() && !timeOfEvent.isEmpty() && !date.isEmpty()) {
-                dbHelper.insertEvent(event, timeOfEvent, date);
+                //dbHelper.insertEvent(event, timeOfEvent, date);
                 eventList.add(new PlannerEvent(event, timeOfEvent, date));
                 adapter.notifyDataSetChanged();
             }
@@ -144,7 +144,7 @@ private List<PlannerEvent> eventList;
     private void showCalendarEvents() {
         eventList.clear();
         String date = formatDate(calendar.getTimeInMillis());
-        eventList.addAll(dbHelper.getAllEvents(date));
+        //eventList.addAll(dbHelper.getAllEvents(date));
         adapter.notifyDataSetChanged();
     }
 

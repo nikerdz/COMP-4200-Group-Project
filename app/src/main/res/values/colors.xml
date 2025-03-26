@@ -5,4 +5,7 @@
     <color name="pink">#F393A0</color>
     <color name="tan">#FFF6E9</color>
     <color name="bg">#FEF7FF</color>
+    <color name="grey">#F1E9F7</color>
+    <color name="dark_grey">#DDD3E7</color>
+    <color name="red">#D35E5E</color>
 </resources>

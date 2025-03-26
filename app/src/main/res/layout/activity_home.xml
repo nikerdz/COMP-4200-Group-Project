@@ -115,6 +115,14 @@
             android:gravity="center" />
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/graphic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/graphic"
+        android:layout_below="@id/quote_container"
+        android:layout_marginLeft="60dp" />
+
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
@@ -122,7 +130,7 @@
         android:layout_height="150dp"
         app:itemIconSize="70dp"
         android:layout_alignParentBottom="true"
-        android:background="#F1E9F7"
+        android:background="@color/grey"
         app:menu="@menu/bottom_nav_menu" />
 
 </RelativeLayout>
