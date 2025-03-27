@@ -1,11 +1,13 @@
 package com.example.comp4200groupproject;
 
-import android.content.Context;
+import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +19,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
     private List<Note> displayList;
     private DatabaseHelper dbHelper;
     private NotesActivity activity;
+    private String searchKeyword = "";
 
     public NotesAdapter(List<Note> notesList, DatabaseHelper dbHelper, NotesActivity activity) {
         this.displayList = new ArrayList<>(notesList);
@@ -35,11 +38,26 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
         Note note = displayList.get(position);
-        holder.textViewNoteTile.setText(note.getContent());
+        String content = note.getContent();
 
-        // Use the styled dialog from NotesActivity when clicked
+        if (!searchKeyword.isEmpty()) {
+            SpannableString spannable = new SpannableString(content);
+            int index = content.toLowerCase().indexOf(searchKeyword.toLowerCase());
+            if (index >= 0) {
+                spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#4B0082")),  // Deep purple
+                        index, index + searchKeyword.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.textViewNoteTile.setText(spannable);
+            } else {
+                holder.textViewNoteTile.setText(content);
+            }
+        } else {
+            holder.textViewNoteTile.setText(content);
+        }
+
+        // Click to edit
         holder.itemView.setOnLongClickListener(v -> {
-            activity.showEditNoteDialog(note);   // Use NotesActivity's dialog
+            activity.showEditNoteDialog(note);
             return true;
         });
     }
@@ -49,6 +67,18 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         return displayList.size();
     }
 
+    public void updateList(List<Note> fullList, String query) {
+        searchKeyword = query.trim();
+        displayList.clear();
+
+        for (Note note : fullList) {
+            if (note.getContent().toLowerCase().contains(searchKeyword.toLowerCase())) {
+                displayList.add(note);
+            }
+        }
+
+        notifyDataSetChanged();
+    }
 
     static class NoteViewHolder extends RecyclerView.ViewHolder {
         TextView textViewNoteTile;
