@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -27,6 +28,7 @@ import java.util.List;
 public class NotesActivity extends AppCompatActivity {
 
     private DatabaseHelper dbHelper;
+    private TextView notesTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,9 @@ public class NotesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notes);
 
         dbHelper = new DatabaseHelper(this);
+        notesTitle = findViewById(R.id.notes_title);
+
+        loadUserData();
 
         // Handle FAB click to show Add Note dialog
         FloatingActionButton fabAddNote = findViewById(R.id.btn_add_note);
@@ -72,14 +77,26 @@ public class NotesActivity extends AppCompatActivity {
         loadNotes();
     }
 
+    // Load the user's name and display it in the title
+    private void loadUserData() {
+        Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT name FROM users ORDER BY id DESC LIMIT 1", null);
+        if (cursor.moveToFirst()) {
+            String name = cursor.getString(0);
+            notesTitle.setText(name + "'s Notes");
+        }
+        cursor.close();
+    }
+
     // Method to show the "Add Note" dialog box
     private void showAddNoteDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Note");
 
-        final EditText input = new EditText(this);
-        input.setHint("Enter note content");
-        builder.setView(input);
+        // Inflate the custom layout
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_edit_note, null);
+        EditText input = view.findViewById(R.id.et_note_content);
+
+        builder.setView(view);
+        builder.setTitle("Add Note");
 
         builder.setPositiveButton("Add", (dialog, which) -> {
             String noteText = input.getText().toString().trim();
@@ -92,18 +109,40 @@ public class NotesActivity extends AppCompatActivity {
             }
         });
 
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Set the background color programmatically after displaying the dialog
+        dialog.getWindow().setBackgroundDrawableResource(R.color.bg);
+
+        // Customize button text colors
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        if (positiveButton != null) {
+            positiveButton.setTextColor(getResources().getColor(R.color.pink));  // Pink for "Add"
+        }
+
+        if (negativeButton != null) {
+            negativeButton.setTextColor(getResources().getColor(R.color.pink));  // Pink for "Cancel"
+        }
     }
 
-    // Method to show the "Edit Note" dialog box
-    private void showEditNoteDialog(Note note) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Edit Note");
 
-        final EditText input = new EditText(this);
-        input.setText(note.getContent());
-        builder.setView(input);
+    // Method to show the "Edit Note" dialog box with consistent styling
+    void showEditNoteDialog(Note note) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // Inflate the custom layout
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_edit_note, null);
+        EditText input = view.findViewById(R.id.et_note_content);
+        input.setText(note.getContent());  // Pre-fill with the current note content
+
+        builder.setView(view);
+        builder.setTitle("Edit Note");
 
         builder.setPositiveButton("Save", (dialog, which) -> {
             String newContent = input.getText().toString().trim();
@@ -116,8 +155,42 @@ public class NotesActivity extends AppCompatActivity {
             }
         });
 
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
+        // Neutral Button (Delete)
+        builder.setNeutralButton("Delete", (dialog, which) -> {
+            dbHelper.deleteNote(note.getId());   // Delete the note
+            //originalList.remove(note);
+            //displayList.remove(note);
+            //notifyItemRemoved(position);
+            Toast.makeText(this, "Note deleted!", Toast.LENGTH_SHORT).show();
+            loadNotes();  // Refresh the RecyclerView
+        });
+
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Set the background color programmatically
+        dialog.getWindow().setBackgroundDrawableResource(R.color.bg);
+
+        // Customize button text colors
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button neutralButton = dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL);
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        if (positiveButton != null) {
+            positiveButton.setTextColor(getResources().getColor(R.color.pink));  // Pink for "Save"
+        }
+
+        if (neutralButton != null) {
+            negativeButton.setTextColor(getResources().getColor(R.color.red));
+        }
+
+        if (negativeButton != null) {
+            negativeButton.setTextColor(getResources().getColor(R.color.pink));  // Pink for "Cancel"
+        }
     }
 
     private void loadNotes() {
@@ -135,7 +208,8 @@ public class NotesActivity extends AppCompatActivity {
             tvNoNotes.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
 
-            NotesAdapter adapter = new NotesAdapter(notes, dbHelper);
+            // Pass the activity reference to the adapter
+            NotesAdapter adapter = new NotesAdapter(notes, dbHelper, this);
             recyclerView.setAdapter(adapter);
 
             GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
@@ -150,6 +224,7 @@ public class NotesActivity extends AppCompatActivity {
             });
         }
     }
+
 
 
     // Display the Profile Popup anchored to the profile button

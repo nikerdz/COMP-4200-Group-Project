@@ -55,7 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // ✅ INSERT a new task
+    // INSERT a new task
     public long addTask(String task) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -67,7 +67,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    // ✅ RETRIEVE all tasks
+    // RETRIEVE all tasks
     public List<Task> getAllTasks() {
         List<Task> taskList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -86,7 +86,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return taskList;
     }
 
-    // ✅ UPDATE task content
+    // UPDATE task content
     public void updateTask(int id, String newTask) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -95,7 +95,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    // ✅ TOGGLE task completion status
+    // TOGGLE task completion status
     public void updateTaskCompletionStatus(String taskId, boolean isCompleted) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -106,14 +106,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    // ✅ DELETE a task
+    // DELETE a task
     public void deleteTask(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("todo", "id = ?", new String[]{String.valueOf(id)});
         db.close();
     }
 
-    // ✅ Insert user data
+    // Insert user data
     public long insertUser(String name, String education) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -125,7 +125,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    // ✅ Retrieve user data
+    // Retrieve user data
     public User getUser() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM users LIMIT 1", null);
@@ -142,7 +142,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return user;
     }
 
-    // ✅ Reminder insert method
+    // Reminder insert method
     public long insertReminder(String title, String dueDate) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -154,7 +154,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    // ✅ Update user data
+    // Update user data
     public void updateUser(int id, String name, String education) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -165,7 +165,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    // ✅ Delete user data
+    // Delete user data
     public void deleteUser(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("users", "id = ?", new String[]{String.valueOf(id)});
@@ -199,15 +199,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Method to update an event's details
-    public void updateEvent(int eventId, String eventName, String eventTime, String eventDate) {
+    public void updateEvent(PlannerEvent plannerEvent) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("event_name", eventName);
-        values.put("event_time", eventTime);
-        values.put("event_date", eventDate);
+
+        // Extract values from the PlannerEvent object
+        values.put("event_name", plannerEvent.getTitle());
+        values.put("event_time", plannerEvent.getTime());
+        values.put("event_date", plannerEvent.getDate());
 
         String whereClause = "id = ?";
-        String[] whereArgs = {String.valueOf(eventId)};
+        String[] whereArgs = {String.valueOf(plannerEvent.getId())};
 
         // Update the event
         db.update("events", values, whereClause, whereArgs);

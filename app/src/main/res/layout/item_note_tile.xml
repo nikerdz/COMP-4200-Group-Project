@@ -14,12 +14,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
+        android:fontFamily="@font/honey_blooms"
         android:text="Sample Note"
         android:textSize="16sp"
         android:textColor="@android:color/black"
         android:padding="12dp"
         android:maxLines="4"
         android:ellipsize="end"
-        android:background="@android:color/white" />
+        android:background="@color/tan" />
 
 </androidx.cardview.widget.CardView>

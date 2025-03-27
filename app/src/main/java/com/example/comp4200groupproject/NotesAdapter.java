@@ -1,31 +1,30 @@
 package com.example.comp4200groupproject;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
+
     private List<Note> originalList;
     private List<Note> displayList;
     private DatabaseHelper dbHelper;
+    private NotesActivity activity;  // ✅ Reference to NotesActivity
 
-    public NotesAdapter(List<Note> notesList, DatabaseHelper dbHelper) {
+    public NotesAdapter(List<Note> notesList, DatabaseHelper dbHelper, NotesActivity activity) {
         this.originalList = new ArrayList<>(notesList);
         this.displayList = new ArrayList<>(notesList);
         this.dbHelper = dbHelper;
+        this.activity = activity;  // ✅ Store the activity reference
     }
 
     @NonNull
@@ -41,16 +40,9 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         Note note = displayList.get(position);
         holder.textViewNoteTile.setText(note.getContent());
 
-        // Edit on single click
-        holder.itemView.setOnClickListener(v -> showEditDialog(v.getContext(), note, position));
-
-        // Delete on long press
+        // Use the styled dialog from NotesActivity when clicked
         holder.itemView.setOnLongClickListener(v -> {
-            dbHelper.deleteNote(note.getId());
-            originalList.remove(note);
-            displayList.remove(note);
-            notifyItemRemoved(position);
-            Toast.makeText(v.getContext(), "Note deleted", Toast.LENGTH_SHORT).show();
+            activity.showEditNoteDialog(note);   // Use NotesActivity's dialog
             return true;
         });
     }
@@ -70,29 +62,6 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
             }
         }
         notifyDataSetChanged();
-    }
-
-    private void showEditDialog(Context context, Note note, int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Edit Note");
-
-        final EditText input = new EditText(context);
-        input.setText(note.getContent());
-        builder.setView(input);
-
-        builder.setPositiveButton("Save", (dialog, which) -> {
-            String newContent = input.getText().toString().trim();
-            if (!newContent.isEmpty()) {
-                dbHelper.updateNote(note.getId(), newContent);
-                note.setContent(newContent);
-                notifyItemChanged(position);
-            } else {
-                Toast.makeText(context, "Note cannot be empty", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
     }
 
     static class NoteViewHolder extends RecyclerView.ViewHolder {

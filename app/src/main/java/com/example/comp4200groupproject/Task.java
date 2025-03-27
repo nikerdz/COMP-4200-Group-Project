@@ -5,14 +5,14 @@ public class Task {
     private String task;
     private boolean isCompleted;
 
-    // ✅ Constructor
+    // Constructor
     public Task(int id, String task, boolean isCompleted) {
         this.id = id;
         this.task = task;
         this.isCompleted = isCompleted;
     }
 
-    // ✅ Getters
+    // Getters
     public int getId() {
         return id;
     }
@@ -25,7 +25,7 @@ public class Task {
         return isCompleted;
     }
 
-    // ✅ Setters
+    // Setters
     public void setTask(String task) {
         this.task = task;
     }

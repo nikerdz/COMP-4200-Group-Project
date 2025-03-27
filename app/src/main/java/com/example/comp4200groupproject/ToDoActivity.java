@@ -74,7 +74,7 @@ public class ToDoActivity extends AppCompatActivity {
         });
     }
 
-    // ✅ Load and display all tasks
+    // Load and display all tasks
     private void loadTodoList() {
         llTodoList.removeAllViews();
         Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT * FROM todo", null);
@@ -126,7 +126,7 @@ public class ToDoActivity extends AppCompatActivity {
     }
 
 
-    // ✅ Load the user's name and display it in the title
+    // Load the user's name and display it in the title
     private void loadUserData() {
         Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT name FROM users ORDER BY id DESC LIMIT 1", null);
         if (cursor.moveToFirst()) {
@@ -157,10 +157,10 @@ public class ToDoActivity extends AppCompatActivity {
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
-        // ✅ Create the dialog separately to customize it
+        // Create the dialog separately to customize it
         AlertDialog dialog = builder.create();
 
-        // 🌟 Show the dialog first so we can access the buttons
+        // Show the dialog first so we can access the buttons
         dialog.show();
 
         // Set background color programmatically (after showing the dialog)
@@ -170,16 +170,22 @@ public class ToDoActivity extends AppCompatActivity {
         Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
         Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
 
+        if (positiveButton != null) positiveButton.setTextColor(getResources().getColor(R.color.pink));  // Set text color to pink
+        if (negativeButton != null) negativeButton.setTextColor(getResources().getColor(R.color.pink));  // Set text color to pink
+
         if (positiveButton != null) {
-            positiveButton.setTextColor(getResources().getColor(R.color.pink));  // Set text color to pink
+            positiveButton.setText("Add");  // Set button text manually
+            positiveButton.setAllCaps(false);  // Disable uppercase transformation
         }
 
         if (negativeButton != null) {
-            negativeButton.setTextColor(getResources().getColor(R.color.pink));  // Set text color to pink
+            negativeButton.setText("Cancel");
+            negativeButton.setAllCaps(false);  // Disable uppercase transformation
         }
+
     }
 
-    // ✅ Display dialog for editing or deleting a task
+    // Display dialog for editing or deleting a task
     private void showEditTaskDialog(String taskId, String currentDescription) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -227,26 +233,35 @@ public class ToDoActivity extends AppCompatActivity {
         Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
         Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
 
-        if (positiveButton != null) {
-            positiveButton.setTextColor(getResources().getColor(R.color.pink));  // Set text color to pink for Save
-        }
+        if (positiveButton != null) positiveButton.setTextColor(getResources().getColor(R.color.pink));  // Set text color to pink for Save
 
-        if (neutralButton != null) {
-            neutralButton.setTextColor(getResources().getColor(R.color.red));  // Set text color to pink for Delete
+        if (neutralButton != null) neutralButton.setTextColor(getResources().getColor(R.color.red));  // Set text color to pink for Delete
+
+        if (negativeButton != null) negativeButton.setTextColor(getResources().getColor(R.color.pink));  // Set text color to pink for Cancel
+
+        if (positiveButton != null) {
+            positiveButton.setText("Save");  // Set button text manually
+            positiveButton.setAllCaps(false);  // Disable uppercase transformation
         }
 
         if (negativeButton != null) {
-            negativeButton.setTextColor(getResources().getColor(R.color.pink));  // Set text color to pink for Cancel
+            negativeButton.setText("Cancel");
+            negativeButton.setAllCaps(false);  // Disable uppercase transformation
+        }
+
+        if (neutralButton != null) {
+            neutralButton.setText("Delete");
+            neutralButton.setAllCaps(false);  // Disable uppercase transformation
         }
     }
 
-    // ✅ Display the Profile Popup anchored to the profile button
+    // Display the Profile Popup anchored to the profile button
     private void showProfilePopup(View anchorView) {
         View popupView = LayoutInflater.from(this).inflate(R.layout.profile_popup, null);
         PopupWindow popupWindow = new PopupWindow(
                 popupView,
-                800,  // Width
-                1200,  // Height
+                800,
+                1200,
                 true
         );
 

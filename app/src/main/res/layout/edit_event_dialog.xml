@@ -7,23 +7,21 @@
     android:background="@color/bg"
     android:gravity="center">
 
-    <!-- Event Name Input -->
     <EditText
-        android:id="@+id/eventName"
+        android:id="@+id/et_edit_event_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Event Name"
+        android:hint="Event Name"
         android:textSize="16sp"
         android:padding="12dp"
         android:background="@color/bg"
         android:layout_marginBottom="16dp" />
 
-    <!-- Event Time Input -->
     <EditText
-        android:id="@+id/EventTime"
+        android:id="@+id/et_edit_event_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Time"
+        android:hint="Event Time"
         android:inputType="time"
         android:textSize="16sp"
         android:padding="12dp"

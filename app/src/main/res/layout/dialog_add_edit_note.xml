@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -7,29 +9,14 @@
     android:background="@color/bg"
     android:gravity="center">
 
-    <!-- Event Name Input -->
+    <!-- Note Content Input -->
     <EditText
-        android:id="@+id/eventName"
+        android:id="@+id/et_note_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Event Name"
+        android:hint="Enter note content"
         android:textSize="16sp"
         android:padding="12dp"
         android:background="@color/bg"
         android:layout_marginBottom="16dp" />
-
-    <!-- Event Time Input -->
-    <EditText
-        android:id="@+id/EventTime"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter Time"
-        android:inputType="time"
-        android:textSize="16sp"
-        android:padding="12dp"
-        android:background="@color/bg"
-        android:layout_marginBottom="16dp"
-        android:focusable="false"
-        android:clickable="true" />
-
 </LinearLayout>
