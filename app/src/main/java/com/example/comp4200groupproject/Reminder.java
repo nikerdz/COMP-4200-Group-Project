@@ -5,10 +5,12 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class Reminder {
+    private int id;
     private String title;
     private String dueDate;
 
-    public Reminder(String title, String dueDate) {
+    public Reminder(int id, String title, String dueDate) {
+        this.id = id;
         this.title = title;
         this.dueDate = dueDate;
     }
@@ -26,5 +28,21 @@ public class Reminder {
         } catch (Exception e) {
             return "Invalid Date";
         }
+    }
+
+    public String getDate() {
+        return dueDate;
+    }
+
+    public void setTitle(String updatedTitle) {
+        this.title = updatedTitle;
+    }
+
+    public void setDate(String updatedDate) {
+        this.dueDate = updatedDate;
+    }
+
+    public int getId() {
+        return id;
     }
 }

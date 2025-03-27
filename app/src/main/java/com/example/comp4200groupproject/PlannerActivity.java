@@ -33,7 +33,7 @@ import java.util.Locale;
 
 public class PlannerActivity extends AppCompatActivity {
 
-    private TextView plannerTitle;
+    private TextView plannerTitle, emptyMessage;
     private CalendarView calendarView;
     private RecyclerView rvEventList;
     private PlannerAdapter eventAdapter;
@@ -53,6 +53,7 @@ public class PlannerActivity extends AppCompatActivity {
         calendar = Calendar.getInstance();
         currentDate = formatDate(calendar.getTimeInMillis());
         plannerTitle = findViewById(R.id.planner_title);
+        emptyMessage = findViewById(R.id.tv_empty_message);
 
         eventList = new ArrayList<>();
         eventAdapter = new PlannerAdapter(eventList, dbHelper);
@@ -112,7 +113,6 @@ public class PlannerActivity extends AppCompatActivity {
         }
         cursor.close();
     }
-
 
     private void addCalendarEvent() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -177,7 +177,6 @@ public class PlannerActivity extends AppCompatActivity {
             }
         });
 
-
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
         // Create and show the dialog
@@ -205,7 +204,7 @@ public class PlannerActivity extends AppCompatActivity {
         eventList.addAll(dbHelper.getAllEvents(date));
         eventAdapter.notifyDataSetChanged();
 
-        findViewById(R.id.tv_empty_message).setVisibility(eventList.isEmpty() ? View.VISIBLE : View.GONE);
+
     }
 
     private String formatDate(long dateInMillis) {

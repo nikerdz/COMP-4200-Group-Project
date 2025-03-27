@@ -13,9 +13,6 @@
             android:name=".HomeActivity"
             android:exported="false" />
         <activity
-            android:name=".AddReminderActivity"
-            android:exported="false" /> <!-- Main Activity (Home Page) -->
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

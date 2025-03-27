@@ -154,6 +154,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    public int updateReminder(Reminder reminder) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        // Add updated values
+        values.put("title", reminder.getTitle());
+        values.put("date", reminder.getDate());
+
+        // Update the reminder by ID
+        int rowsAffected = db.update(
+                "reminders",                // Table name
+                values,                     // Updated values
+                "id = ?",                   // WHERE clause
+                new String[]{String.valueOf(reminder.getId())}  // Arguments
+        );
+
+        db.close();
+        return rowsAffected;  // Return the number of rows updated
+    }
+
+
     // Update user data
     public void updateUser(int id, String name, String education) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -261,13 +282,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Reminder> getAllReminders() {
         List<Reminder> reminders = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM reminders", null);
+
+        // Include the ID in the query
+        Cursor cursor = db.rawQuery("SELECT id, title, due_date FROM reminders", null);
 
         while (cursor.moveToNext()) {
-            reminders.add(new Reminder(
-                    cursor.getString(cursor.getColumnIndexOrThrow("title")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("due_date"))
-            ));
+            // Retrieve the ID along with the title and due_date
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+            String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
+            String dueDate = cursor.getString(cursor.getColumnIndexOrThrow("due_date"));
+
+            // Create Reminder object with the ID
+            reminders.add(new Reminder(id, title, dueDate));
         }
 
         cursor.close();
@@ -276,11 +302,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public void deleteReminder(String title) {
+
+    public void deleteReminder(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete("reminders", "title = ?", new String[]{title});
+
+        // Delete by ID to avoid accidental duplicates
+        db.delete("reminders", "id = ?", new String[]{String.valueOf(id)});
+
         db.close();
     }
+
 
     // Notes Section (already present)
 
@@ -322,21 +353,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("notes", "id = ?", new String[]{String.valueOf(id)});
         db.close();
-    }
-
-    public int getLastInsertedNoteId() {
-        int lastId = -1;  // Default value in case nothing is found
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.rawQuery("SELECT id FROM notes ORDER BY id DESC LIMIT 1", null);
-
-        if (cursor != null && cursor.moveToFirst()) {
-            lastId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-            cursor.close();
-        }
-
-        db.close();
-        return lastId;
     }
 
 }

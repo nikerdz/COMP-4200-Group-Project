@@ -11,9 +11,18 @@ import java.util.List;
 
 public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ReminderViewHolder> {
     private List<Reminder> reminderList;
+    private OnItemLongClickListener longClickListener;
 
     public ReminderAdapter(List<Reminder> reminderList) {
         this.reminderList = reminderList;
+    }
+
+    public interface OnItemLongClickListener {
+        void onItemLongClick(Reminder reminder);
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        this.longClickListener = listener;
     }
 
     @NonNull
@@ -30,18 +39,11 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         holder.dueDate.setText("Due Date: " + reminder.getDueDate());
         holder.countdown.setText(reminder.getCountdown());
 
+        // Long-click listener to edit reminder
         holder.itemView.setOnLongClickListener(v -> {
-            new AlertDialog.Builder(v.getContext())
-                    .setTitle("Delete Reminder")
-                    .setMessage("Are you sure you want to delete this reminder?")
-                    .setPositiveButton("Delete", (dialog, which) -> {
-                        DatabaseHelper dbHelper = new DatabaseHelper(v.getContext());
-                        dbHelper.deleteReminder(reminder.getTitle());
-                        reminderList.remove(position);
-                        notifyItemRemoved(position);
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
+            if (longClickListener != null) {
+                longClickListener.onItemLongClick(reminder);
+            }
             return true;
         });
     }

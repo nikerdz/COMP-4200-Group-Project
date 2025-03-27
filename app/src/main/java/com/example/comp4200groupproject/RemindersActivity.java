@@ -1,5 +1,7 @@
 package com.example.comp4200groupproject;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -7,6 +9,8 @@ import android.os.RemoteCallbackList;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -18,6 +22,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class RemindersActivity extends AppCompatActivity {
@@ -25,6 +30,7 @@ public class RemindersActivity extends AppCompatActivity {
     private ReminderAdapter adapter;
     private DatabaseHelper dbHelper;
     private TextView noRemindersTextView, remindersTitle;
+    private String selectedDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +65,12 @@ public class RemindersActivity extends AppCompatActivity {
             noRemindersTextView.setVisibility(View.GONE);  // Hide the message
         }
 
-        // FloatingActionButton to add new reminder
+        // FloatingActionButton to add new reminder (now showing dialog)
         FloatingActionButton fab = findViewById(R.id.btn_add_reminder);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(RemindersActivity.this, AddReminderActivity.class));
+                showAddReminderDialog();  // Show dialog instead of new activity
             }
         });
 
@@ -115,13 +121,229 @@ public class RemindersActivity extends AppCompatActivity {
         }
     }
 
-    // Display the Profile Popup anchored to the profile button
+    private void showAddReminderDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // Inflate the custom layout
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_reminder, null);
+        EditText etReminderTitle = view.findViewById(R.id.et_reminder);
+        EditText etReminderDate = view.findViewById(R.id.reminder_date);
+
+        // Initialize date picker
+        final Calendar calendar = Calendar.getInstance();
+        final int[] selectedYear = {calendar.get(Calendar.YEAR)};
+        final int[] selectedMonth = {calendar.get(Calendar.MONTH)};
+        final int[] selectedDay = {calendar.get(Calendar.DAY_OF_MONTH)};
+
+        // Handle date picker button click
+        etReminderDate.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    this,
+                    (view1, year, month, dayOfMonth) -> {
+                        selectedYear[0] = year;
+                        selectedMonth[0] = month;
+                        selectedDay[0] = dayOfMonth;
+
+                        // Display the selected date in the TextView
+                        String selectedDate = year + "-" + (month + 1) + "-" + dayOfMonth;
+                        etReminderDate.setText(selectedDate);
+                    },
+                    selectedYear[0], selectedMonth[0], selectedDay[0]
+            );
+            datePickerDialog.show();
+        });
+
+        builder.setView(view);
+        builder.setTitle("Add New Reminder");
+
+        // Positive button to save the reminder
+        builder.setPositiveButton("Add", (dialog, which) -> {
+            String reminderTitle = etReminderTitle.getText().toString().trim();
+            String reminderDate = etReminderDate.getText().toString().trim();
+
+            if (!reminderTitle.isEmpty() && !reminderDate.equals("Select Date")) {
+                // Add reminder to the database
+                DatabaseHelper dbHelper = new DatabaseHelper(this);
+                long id = dbHelper.insertReminder(reminderTitle, reminderDate);
+
+                if (id != -1) {
+                    Toast.makeText(this, "Reminder added successfully!", Toast.LENGTH_SHORT).show();
+                    loadReminders();  // Refresh the list
+                } else {
+                    Toast.makeText(this, "Failed to add reminder.", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Please enter both title and date.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Set background color programmatically (after showing the dialog)
+        dialog.getWindow().setBackgroundDrawableResource(R.color.bg);  // Use a light color for visibility
+
+        // Ensure buttons have visible text and background
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        if (positiveButton != null) positiveButton.setTextColor(getResources().getColor(R.color.pink));  // Set text color to pink
+        if (negativeButton != null) negativeButton.setTextColor(getResources().getColor(R.color.pink));  // Set text color to pink
+
+        if (positiveButton != null) {
+            positiveButton.setText("Add");  // Set button text manually
+            positiveButton.setAllCaps(false);  // Disable uppercase transformation
+        }
+
+        if (negativeButton != null) {
+            negativeButton.setText("Cancel");
+            negativeButton.setAllCaps(false);  // Disable uppercase transformation
+        }
+
+    }
+
+    // Display dialog for editing or deleting a task
+    private void showEditReminderDialog(Reminder reminder) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // Inflate the custom layout
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_reminder, null);
+        EditText etReminderTitle = view.findViewById(R.id.et_reminder);
+        EditText etReminderDate = view.findViewById(R.id.reminder_date);
+
+        // Pre-fill fields with existing reminder data
+        etReminderTitle.setText(reminder.getTitle());
+        etReminderDate.setText(reminder.getDate());
+
+        // Initialize date picker
+        final Calendar calendar = Calendar.getInstance();
+        final int[] selectedYear = {calendar.get(Calendar.YEAR)};
+        final int[] selectedMonth = {calendar.get(Calendar.MONTH)};
+        final int[] selectedDay = {calendar.get(Calendar.DAY_OF_MONTH)};
+
+        // Handle date picker button click
+        etReminderDate.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    this,
+                    (view1, year, month, dayOfMonth) -> {
+                        selectedYear[0] = year;
+                        selectedMonth[0] = month;
+                        selectedDay[0] = dayOfMonth;
+
+                        // Display the selected date in the EditText
+                        String selectedDate = year + "-" + (month + 1) + "-" + dayOfMonth;
+                        etReminderDate.setText(selectedDate);
+                    },
+                    selectedYear[0], selectedMonth[0], selectedDay[0]
+            );
+            datePickerDialog.show();
+        });
+
+        builder.setView(view);
+        builder.setTitle("Edit Reminder");
+
+        // Positive button for updating the reminder
+        builder.setPositiveButton("Update", (dialog, which) -> {
+            String updatedTitle = etReminderTitle.getText().toString().trim();
+            String updatedDate = etReminderDate.getText().toString().trim();
+
+            if (!updatedTitle.isEmpty() && !updatedDate.isEmpty()) {
+                DatabaseHelper dbHelper = new DatabaseHelper(this);
+
+                // Update the reminder object
+                reminder.setTitle(updatedTitle);
+                reminder.setDate(updatedDate);
+
+                // Call the update method
+                int rowsAffected = dbHelper.updateReminder(reminder);
+
+                if (rowsAffected > 0) {
+                    Toast.makeText(this, "Reminder updated successfully!", Toast.LENGTH_SHORT).show();
+                    loadReminders();  // Refresh the list
+                } else {
+                    Toast.makeText(this, "Failed to update reminder.", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Please enter both title and date.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Neutral Button (Delete)
+        builder.setNeutralButton("Delete", (dialog, which) -> {
+            dbHelper.deleteReminder(reminder.getId());  // Use the ID to delete the reminder
+            loadReminders();  // Refresh the RecyclerView
+            Toast.makeText(this, "Reminder deleted!", Toast.LENGTH_SHORT).show();
+        });
+
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Set background color programmatically
+        dialog.getWindow().setBackgroundDrawableResource(R.color.bg);  // Use a light color for visibility
+
+        // Customize button colors
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        if (positiveButton != null) positiveButton.setTextColor(getResources().getColor(R.color.pink));  // Set text color to pink for Save
+
+        if (neutralButton != null) neutralButton.setTextColor(getResources().getColor(R.color.red));  // Set text color to pink for Delete
+
+        if (negativeButton != null) negativeButton.setTextColor(getResources().getColor(R.color.pink));  // Set text color to pink for Cancel
+
+        if (positiveButton != null) {
+            positiveButton.setText("Save");  // Set button text manually
+            positiveButton.setAllCaps(false);  // Disable uppercase transformation
+        }
+
+        if (negativeButton != null) {
+            negativeButton.setText("Cancel");
+            negativeButton.setAllCaps(false);  // Disable uppercase transformation
+        }
+
+        if (neutralButton != null) {
+            neutralButton.setText("Delete");
+            neutralButton.setAllCaps(false);  // Disable uppercase transformation
+        }
+    }
+
+    // Method to load all reminders into the RecyclerView
+    private void loadReminders() {
+        List<Reminder> reminderList = dbHelper.getAllReminders();
+
+        // Show or hide 'No Reminders' message based on data
+        if (reminderList.isEmpty()) {
+            noRemindersTextView.setVisibility(View.VISIBLE);
+        } else {
+            noRemindersTextView.setVisibility(View.GONE);
+        }
+
+        // Update the RecyclerView with the new reminder list
+        adapter = new ReminderAdapter(reminderList);
+
+        // Handle long-press to edit a reminder
+        adapter.setOnItemLongClickListener(reminder -> {
+            showEditReminderDialog(reminder);  // Open the edit dialog with the selected reminder
+        });
+
+        recyclerView.setAdapter(adapter);
+    }
+
+
     private void showProfilePopup(View anchorView) {
         View popupView = LayoutInflater.from(this).inflate(R.layout.profile_popup, null);
         PopupWindow popupWindow = new PopupWindow(
                 popupView,
-                800,  // Width
-                1200,  // Height
+                800,
+                1200,
                 true
         );
 
