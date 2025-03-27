@@ -14,17 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
-
-    private List<Note> originalList;
     private List<Note> displayList;
     private DatabaseHelper dbHelper;
-    private NotesActivity activity;  // ✅ Reference to NotesActivity
+    private NotesActivity activity;
 
     public NotesAdapter(List<Note> notesList, DatabaseHelper dbHelper, NotesActivity activity) {
-        this.originalList = new ArrayList<>(notesList);
         this.displayList = new ArrayList<>(notesList);
         this.dbHelper = dbHelper;
-        this.activity = activity;  // ✅ Store the activity reference
+        this.activity = activity;
     }
 
     @NonNull
@@ -52,17 +49,6 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         return displayList.size();
     }
 
-    public void updateList(List<Note> fullList, String keyword) {
-        this.originalList = new ArrayList<>(fullList);
-        this.displayList.clear();
-
-        for (Note note : originalList) {
-            if (note.getContent().toLowerCase().contains(keyword.toLowerCase())) {
-                this.displayList.add(note);
-            }
-        }
-        notifyDataSetChanged();
-    }
 
     static class NoteViewHolder extends RecyclerView.ViewHolder {
         TextView textViewNoteTile;

@@ -28,6 +28,7 @@ import java.util.List;
 public class NotesActivity extends AppCompatActivity {
 
     private DatabaseHelper dbHelper;
+    private RecyclerView recyclerView;
     private TextView notesTitle;
 
     @Override
@@ -38,7 +39,20 @@ public class NotesActivity extends AppCompatActivity {
         dbHelper = new DatabaseHelper(this);
         notesTitle = findViewById(R.id.notes_title);
 
+        recyclerView = findViewById(R.id.recyclerViewNotes);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        recyclerView.setLayoutManager(gridLayoutManager);
+
+        // Add spacing between tiles
+        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, RecyclerView parent, @NonNull RecyclerView.State state) {
+                outRect.set(16, 16, 16, 16);
+            }
+        });
+
         loadUserData();
+        loadNotes();
 
         // Handle FAB click to show Add Note dialog
         FloatingActionButton fabAddNote = findViewById(R.id.btn_add_note);
@@ -116,7 +130,7 @@ public class NotesActivity extends AppCompatActivity {
         dialog.show();
 
         // Set the background color programmatically after displaying the dialog
-        dialog.getWindow().setBackgroundDrawableResource(R.color.bg);
+        dialog.getWindow().setBackgroundDrawableResource(R.color.tan);
 
         // Customize button text colors
         Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -165,7 +179,6 @@ public class NotesActivity extends AppCompatActivity {
             loadNotes();  // Refresh the RecyclerView
         });
 
-
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
         // Create and show the dialog
@@ -173,24 +186,17 @@ public class NotesActivity extends AppCompatActivity {
         dialog.show();
 
         // Set the background color programmatically
-        dialog.getWindow().setBackgroundDrawableResource(R.color.bg);
+        dialog.getWindow().setBackgroundDrawableResource(R.color.tan);
 
         // Customize button text colors
         Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
         Button neutralButton = dialog.getButton(android.app.AlertDialog.BUTTON_NEUTRAL);
         Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
 
-        if (positiveButton != null) {
-            positiveButton.setTextColor(getResources().getColor(R.color.pink));  // Pink for "Save"
-        }
+        if (positiveButton != null) positiveButton.setTextColor(getResources().getColor(R.color.pink));  // Pink for "Save"
+        if (neutralButton != null) neutralButton.setTextColor(getResources().getColor(R.color.red));
+        if (negativeButton != null) negativeButton.setTextColor(getResources().getColor(R.color.pink));  // Pink for "Cancel"
 
-        if (neutralButton != null) {
-            negativeButton.setTextColor(getResources().getColor(R.color.red));
-        }
-
-        if (negativeButton != null) {
-            negativeButton.setTextColor(getResources().getColor(R.color.pink));  // Pink for "Cancel"
-        }
     }
 
     private void loadNotes() {
@@ -198,6 +204,7 @@ public class NotesActivity extends AppCompatActivity {
 
         TextView tvNoNotes = findViewById(R.id.tv_no_notes);
         RecyclerView recyclerView = findViewById(R.id.recyclerViewNotes);
+
 
         if (notes.isEmpty()) {
             // Show "No notes found" message and hide RecyclerView
@@ -212,28 +219,16 @@ public class NotesActivity extends AppCompatActivity {
             NotesAdapter adapter = new NotesAdapter(notes, dbHelper, this);
             recyclerView.setAdapter(adapter);
 
-            GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
-            recyclerView.setLayoutManager(gridLayoutManager);
-
-            // Add spacing between tiles
-            recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
-                @Override
-                public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, RecyclerView parent, @NonNull RecyclerView.State state) {
-                    outRect.set(16, 16, 16, 16);
-                }
-            });
         }
     }
-
-
 
     // Display the Profile Popup anchored to the profile button
     private void showProfilePopup(View anchorView) {
         View popupView = LayoutInflater.from(this).inflate(R.layout.profile_popup, null);
         PopupWindow popupWindow = new PopupWindow(
                 popupView,
-                800,  // Width
-                1200,  // Height
+                800,
+                1200,
                 true
         );
 

@@ -282,15 +282,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    // ✅ Notes Section (already present)
+    // Notes Section (already present)
 
     public long addNote(String content) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("content", content);
+
         long id = db.insert("notes", null, values);
-        db.close();
-        return id;
+
+        return id;  // Keep the connection open
     }
 
     public List<Note> getAllNotes() {
@@ -305,9 +306,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         cursor.close();
-        db.close();
         return notesList;
     }
+
 
     public void updateNote(int id, String newContent) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -322,4 +323,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete("notes", "id = ?", new String[]{String.valueOf(id)});
         db.close();
     }
+
+    public int getLastInsertedNoteId() {
+        int lastId = -1;  // Default value in case nothing is found
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT id FROM notes ORDER BY id DESC LIMIT 1", null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            lastId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+            cursor.close();
+        }
+
+        db.close();
+        return lastId;
+    }
+
 }

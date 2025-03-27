@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="24dp"
-    android:background="@color/bg"
+    android:background="@color/tan"
     android:gravity="center">
 
     <!-- Note Content Input -->
@@ -17,6 +17,6 @@
         android:hint="Enter note content"
         android:textSize="16sp"
         android:padding="12dp"
-        android:background="@color/bg"
+        android:background="@color/tan"
         android:layout_marginBottom="16dp" />
 </LinearLayout>

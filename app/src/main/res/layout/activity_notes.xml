@@ -118,7 +118,8 @@
         android:layout_height="0dp"
         android:layout_below="@id/search_container"
         android:layout_above="@id/bottom_navigation"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"/>
 
     <!-- Floating Action Button for Add Event -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
