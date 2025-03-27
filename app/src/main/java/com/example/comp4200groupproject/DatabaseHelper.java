@@ -158,21 +158,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-        // Add updated values
         values.put("title", reminder.getTitle());
-        values.put("date", reminder.getDate());
+        values.put("due_date", reminder.getDate());
 
-        // Update the reminder by ID
         int rowsAffected = db.update(
-                "reminders",                // Table name
-                values,                     // Updated values
-                "id = ?",                   // WHERE clause
-                new String[]{String.valueOf(reminder.getId())}  // Arguments
+                "reminders",
+                values,
+                "id = ?",
+                new String[]{String.valueOf(reminder.getId())}
         );
 
-        db.close();
-        return rowsAffected;  // Return the number of rows updated
+        return rowsAffected;
     }
+
 
 
     // Update user data
