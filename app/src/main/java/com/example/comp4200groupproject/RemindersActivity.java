@@ -1,9 +1,13 @@
 package com.example.comp4200groupproject;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteCallbackList;
 import android.view.Gravity;
@@ -111,6 +115,7 @@ public class RemindersActivity extends AppCompatActivity {
         // Refresh the reminder list when the activity is resumed
         List<Reminder> reminderList = dbHelper.getAllReminders();
         adapter = new ReminderAdapter(reminderList);
+        adapter.setOnItemLongClickListener(reminder -> showEditReminderDialog(reminder));
         recyclerView.setAdapter(adapter);
 
         // Show or hide 'No Reminders' message based on data
@@ -167,6 +172,7 @@ public class RemindersActivity extends AppCompatActivity {
                 long id = dbHelper.insertReminder(reminderTitle, reminderDate);
 
                 if (id != -1) {
+                    notification(id, reminderTitle, reminderDate); // Schedule the notification
                     Toast.makeText(this, "Reminder added successfully!", Toast.LENGTH_SHORT).show();
                     loadReminders();  // Refresh the list
                 } else {
@@ -335,6 +341,34 @@ public class RemindersActivity extends AppCompatActivity {
         });
 
         recyclerView.setAdapter(adapter);
+    }
+
+    private void notification(long id, String title, String date) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, ReminderReceiver.class);
+        intent.putExtra("reminder_id", id);
+        intent.putExtra("reminder_title", title);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this, (int) id, intent, PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        String[] parts = date.split("-");
+        int year = Integer.parseInt(parts[0]);
+        int month = Integer.parseInt(parts[1]) - 1; // Month is zero-based
+        int day = Integer.parseInt(parts[2]);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day, 9, 0, 0); // Default time: 9 AM
+
+        // Set the alarm
+        if (alarmManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+            } else {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+            }
+        }
     }
 
 
